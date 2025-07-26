@@ -17,16 +17,14 @@
             android:label="@string/title_activity_login"
             android:theme="@style/Theme.ShineSales" />
         <activity
-            android:name=".view.SplashActivity"
-            android:exported="true"
-            android:label="@string/title_activity_splash"
-            android:theme="@style/Theme.ShineSales" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:name=".view.RegistrationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.ResetPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.DashboardActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
