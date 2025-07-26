@@ -1,4 +1,4 @@
-package com.example.shinesale.view.ui.theme
+package com.example.shinesales.view.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

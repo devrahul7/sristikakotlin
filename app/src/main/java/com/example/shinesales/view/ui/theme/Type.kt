@@ -1,4 +1,4 @@
-package com.example.shinesale.view.ui.theme
+package com.example.shinesales.view.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

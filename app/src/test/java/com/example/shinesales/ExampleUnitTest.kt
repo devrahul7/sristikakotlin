@@ -1,4 +1,4 @@
-package com.example.shinesale
+package com.example.shinesales
 
 import org.junit.Test
 

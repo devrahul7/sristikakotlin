@@ -2,15 +2,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
-    namespace = "com.example.shinesale"
+    namespace = "com.example.shinesales"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.shinesale"
+        applicationId = "com.example.shinesales"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -50,7 +49,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
