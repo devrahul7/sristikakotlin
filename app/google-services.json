@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "584090976570",
+    "firebase_url": "https://shinesale-3dd3f-default-rtdb.firebaseio.com",
+    "project_id": "shinesale-3dd3f",
+    "storage_bucket": "shinesale-3dd3f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584090976570:android:82f40db4b1d2661f3b5003",
+        "android_client_info": {
+          "package_name": "com.example.shinesale"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBy7LbyFG7FU1N1esWknVWXv2mM3Zc4eGk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584090976570:android:a47cd4d6d99596703b5003",
+        "android_client_info": {
+          "package_name": "com.example.shinesales"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBy7LbyFG7FU1N1esWknVWXv2mM3Zc4eGk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
