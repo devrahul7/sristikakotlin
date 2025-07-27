@@ -809,22 +809,22 @@ fun ProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(R.drawable.img),
+                    painter = painterResource(R.drawable.beatiful),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(80.dp)
-                        .clip(CircleShape)
+                        .size(160.dp)
+                        .clip(CircleShape).padding(8.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     userName,
-                    fontSize = 20.sp,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
                 Text(
                     "✨ Premium Jewelry Member ✨",
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     color = Color.White.copy(alpha = 0.8f)
                 )
             }
