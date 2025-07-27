@@ -10,8 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,9 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shinesales.R
@@ -52,7 +53,7 @@ fun DashboardScreen() {
     val repo = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repo) }
 
-    // ✅ BASIC STATE MANAGEMENT - No LiveData observation needed
+    // State management
     var selectedTab by remember { mutableStateOf(0) }
     var userName by remember { mutableStateOf("User") }
     var userEmail by remember { mutableStateOf("") }
@@ -64,21 +65,12 @@ fun DashboardScreen() {
     val goldColor = Color(0xFFFFD700)
     val backgroundColor = Color(0xFFF8F6FF)
 
-    val featuredProducts = listOf(
-        "Gold Ring" to "₹45,000",
-        "Diamond Necklace" to "₹85,000",
-        "Pearl Earrings" to "₹25,000",
-        "Silver Bracelet" to "₹15,000"
-    )
-
-    // ✅ BASIC DATA LOADING - Manual state updates
+    // Data loading
     LaunchedEffect(Unit) {
         val currentUser = userViewModel.getCurrentUser()
         if (currentUser != null) {
-            // Manual callback to update states
             userViewModel.getUserByID(currentUser.uid)
 
-            // Get user data with callback
             repo.getUserByID(currentUser.uid) { user, success, message ->
                 if (success && user != null) {
                     userName = user.fullName.ifEmpty { "Jewelry Lover" }
@@ -117,7 +109,7 @@ fun DashboardScreen() {
                     )
                 },
                 actions = {
-                    if (selectedTab == 0) { // Only show on home screen
+                    if (selectedTab == 0) {
                         IconButton(onClick = { /* Handle notifications */ }) {
                             Icon(
                                 Icons.Default.Notifications,
@@ -189,7 +181,6 @@ fun DashboardScreen() {
                 primaryColor = primaryColor,
                 goldColor = goldColor,
                 backgroundColor = backgroundColor,
-                featuredProducts = featuredProducts,
                 navigateToAddProduct = ::navigateToAddProduct,
                 navigateToViewAddedProduct = ::navigateToViewAddedProduct,
                 userName = userName
@@ -215,7 +206,6 @@ fun HomeScreen(
     primaryColor: Color,
     goldColor: Color,
     backgroundColor: Color,
-    featuredProducts: List<Pair<String, String>>,
     navigateToAddProduct: () -> Unit,
     navigateToViewAddedProduct: () -> Unit,
     userName: String
@@ -272,11 +262,70 @@ fun HomeScreen(
             }
         }
 
-        // View Added Product Button
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 1. Attractive Jewelry Showcase Image (First Position)
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(20.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.img), // Replace with your jewelry showcase image
+                    contentDescription = "Premium Jewelry Collection",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+                // Gradient overlay for better text visibility
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.7f)
+                                )
+                            )
+                        )
+                )
+
+                // Text overlay on image
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        "Exquisite Jewelry",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        "Crafted with precision & elegance",
+                        fontSize = 14.sp,
+                        color = Color.White.copy(alpha = 0.9f)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 2. View Added Product Button (Second Position)
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
                 .clickable { navigateToViewAddedProduct() },
             colors = CardDefaults.cardColors(
                 containerColor = goldColor.copy(alpha = 0.1f)
@@ -329,138 +378,400 @@ fun HomeScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Featured Products Header
-        Row(
+        // 3. Add Product to Cart Button (Third Position)
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
-            Text(
-                "Featured Products",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF2D1B3D)
-            )
-            TextButton(onClick = { /* Handle view all */ }) {
-                Text(
-                    "View All",
-                    color = primaryColor,
-                    fontWeight = FontWeight.Medium
+            Button(
+                onClick = { navigateToAddProduct() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = primaryColor
+                ),
+                shape = RoundedCornerShape(16.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 0.dp
                 )
-            }
-        }
-
-        // Featured Products Grid
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(featuredProducts.size) { index ->
-                val (name, price) = featuredProducts[index]
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { /* Handle product click */ },
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                    shape = RoundedCornerShape(16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(130.dp)
-                                .background(Color(0xFFF8F6FF), RoundedCornerShape(12.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.img),
-                                contentDescription = name,
-                                modifier = Modifier.size(90.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Add Product",
+                        modifier = Modifier.size(28.dp),
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text(
-                            name,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF2D1B3D)
-                        )
-
-                        Text(
-                            price,
-                            fontSize = 17.sp,
+                            "Add Product to Cart",
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = primaryColor
+                            color = Color.White
                         )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Button(
-                            onClick = { navigateToAddProduct() },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                            shape = RoundedCornerShape(12.dp),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp),
-                                tint = Color.White
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Add to Cart",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.White
-                            )
-                        }
+                        Text(
+                            "Start shopping now!",
+                            fontSize = 12.sp,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
                     }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(paddingValues: PaddingValues, primaryColor: Color) {
+    val context = LocalContext.current
+    val repo = remember { UserRepositoryImpl() }
+    val userViewModel = remember { UserViewModel(repo) }
+
+    var searchQuery by remember { mutableStateOf("") }
+    var searchResults by remember { mutableStateOf<List<String>>(emptyList()) }
+    var allProducts by remember { mutableStateOf<List<String>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var hasError by remember { mutableStateOf(false) }
+
+    // Load actual added products
+    LaunchedEffect(Unit) {
+        val currentUser = userViewModel.getCurrentUser()
+        if (currentUser != null) {
+            try {
+                // Replace this with your actual method to get products
+                // Example: Load products from your repository
+                // repo.getProductsByUserId(currentUser.uid) { products, success, message ->
+                //     if (success && products != null) {
+                //         allProducts = products.map { "${it.name} - ₹${it.price}" }
+                //     } else {
+                //         hasError = true
+                //     }
+                //     isLoading = false
+                // }
+
+                // For now, simulating loading - replace with actual data loading
+                kotlinx.coroutines.delay(1000) // Simulate network delay
+
+                // You'll need to replace this with actual product loading logic
+                // This is just a placeholder until you implement proper product fetching
+                allProducts = emptyList() // This will be populated with real products
+                isLoading = false
+
+            } catch (e: Exception) {
+                hasError = true
+                isLoading = false
+            }
+        } else {
+            isLoading = false
+            hasError = true
+        }
+    }
+
+    // Filter products based on search query
+    LaunchedEffect(searchQuery, allProducts) {
+        searchResults = if (searchQuery.isBlank()) {
+            emptyList()
+        } else {
+            allProducts.filter {
+                it.lowercase().contains(searchQuery.lowercase())
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .padding(16.dp)
     ) {
-        Icon(
-            Icons.Default.Search,
-            contentDescription = "Search",
-            tint = primaryColor,
-            modifier = Modifier.size(80.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+        // Search Header
         Text(
-            "Search Feature",
+            "🔍 Search Added Products",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryColor
+            color = primaryColor,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
-        Text(
-            "Coming Soon!",
-            fontSize = 16.sp,
-            color = Color.Gray
+
+        // Search Bar
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp),
+            placeholder = { Text("Search your added products...") },
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = primaryColor
+                )
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { searchQuery = "" }) {
+                        Icon(
+                            Icons.Default.Clear,
+                            contentDescription = "Clear",
+                            tint = Color.Gray
+                        )
+                    }
+                }
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = primaryColor,
+                focusedLabelColor = primaryColor,
+                cursorColor = primaryColor
+            ),
+            shape = RoundedCornerShape(12.dp),
+            enabled = !isLoading
         )
+
+        // Content based on state
+        when {
+            isLoading -> {
+                // Loading state
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = primaryColor,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        "Loading your products...",
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+
+            hasError -> {
+                // Error state
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = "Error",
+                        tint = Color.Red,
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        "Unable to load products",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Gray
+                    )
+                    Text(
+                        "Please check your connection and try again",
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            allProducts.isEmpty() && searchQuery.isEmpty() -> {
+                // No products added yet
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        Icons.Default.ShoppingCart,
+                        contentDescription = "No Products",
+                        tint = primaryColor.copy(alpha = 0.6f),
+                        modifier = Modifier.size(80.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        "No Products Added",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryColor
+                    )
+                    Text(
+                        "You haven't added any products yet.\nStart by adding some jewelry items!",
+                        fontSize = 16.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = {
+                            val intent = Intent(context, AddProductActivity::class.java)
+                            context.startActivity(intent)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Add Product")
+                    }
+                }
+            }
+
+            searchQuery.isNotEmpty() -> {
+                if (searchResults.isNotEmpty()) {
+                    // Search results found
+                    Text(
+                        "Found ${searchResults.size} product(s)",
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(searchResults.size) { index ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { /* Handle product click */ },
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                            .background(primaryColor.copy(alpha = 0.1f), CircleShape),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            Icons.Default.ShoppingCart,
+                                            contentDescription = "Product",
+                                            tint = primaryColor,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            searchResults[index],
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color(0xFF2D1B3D)
+                                        )
+                                        Text(
+                                            "Added to your collection",
+                                            fontSize = 12.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                    Icon(
+                                        Icons.Default.KeyboardArrowRight,
+                                        contentDescription = "View Details",
+                                        tint = primaryColor
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // No search results found
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = "No Results",
+                            tint = Color.Gray,
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "No Products Found",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Gray
+                        )
+                        Text(
+                            "No products match your search \"$searchQuery\"",
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "Try different keywords or check spelling",
+                            fontSize = 12.sp,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+
+            else -> {
+                // Default state - show all products or search prompt
+                if (allProducts.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = primaryColor.copy(alpha = 0.6f),
+                            modifier = Modifier.size(80.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "Search Your Products",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = primaryColor
+                        )
+                        Text(
+                            "You have ${allProducts.size} product(s) added",
+                            fontSize = 16.sp,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            "Enter keywords to find your jewelry items",
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -572,7 +883,7 @@ fun ProfileScreen(
                             value = "Please wait...",
                             primaryColor = primaryColor
                         )
-                        if (it < 2) Divider(modifier = Modifier.padding(vertical = 8.dp))
+                        if (it < 2) HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     }
                 }
             }
@@ -580,16 +891,8 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Profile Options
-        ProfileOption(
-            icon = Icons.Default.Edit,
-            title = "Edit Profile",
-            subtitle = "Update your personal information",
-            onClick = {
-//                val intent = Intent(context, EditProfileActivity::class.java)
-//                context.startActivity(intent)
-            }
-        )
+
+
 
         ProfileOption(
             icon = Icons.Default.ExitToApp,
@@ -644,7 +947,7 @@ fun UserInfoRow(
         }
     }
     if (label != "Address") {
-        Divider(modifier = Modifier.padding(vertical = 8.dp))
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
     }
 }
 
